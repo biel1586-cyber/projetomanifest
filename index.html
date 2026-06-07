@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diário de Implantação — Orizon</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root {
+  --blue:        #003F88;
+  --blue-mid:    #1A56A0;
+  --blue-lt:     #EBF2FC;
+  --blue-bdr:    #C0D5F0;
+  --teal:        #00796B;
+  --teal-lt:     #E0F2F0;
+  --green:       #1B6B3A;
+  --green-lt:    #E6F4EC;
+  --amber:       #C05000;
+  --amber-lt:    #FFF1E6;
+  --red:         #B71C1C;
+  --red-lt:      #FDECEA;
+  --purple:      #4A148C;
+  --purple-lt:   #F0EAF9;
+  --white:       #FFFFFF;
+  --gray-50:     #F7F8FC;
+  --gray-100:    #EDF0F7;
+  --gray-200:    #D4DBE8;
+  --gray-400:    #8A97B0;
+  --gray-600:    #4A5570;
+  --gray-800:    #18203A;
+  --radius:      12px;
+  --radius-sm:   8px;
+  --shadow:      0 2px 16px rgba(0,40,120,0.09);
+  --shadow-lg:   0 8px 40px rgba(0,40,120,0.16);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--gray-50);
+  color: var(--gray-800);
+  font-family: 'DM Sans', sans-serif;
+  min-height: 100vh;
+}
+
+/* ── TOPBAR ─────────────────────────────────────────── */
+.topbar {
+  background: var(--blue);
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,.2);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-badge {
+  background: white;
+  border-radius: 7px;
+  padding: 5px 12px;
+  line-height: 1;
+}
+
+.logo-badge .name {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--blue);
+  letter-spacing: -.02em;
+}
+
+.logo-badge .tagline {
+  font-size: .5rem;
+  color: var(--teal);
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 2px;
+}
+
+.logo-divider {
+  width: 1px;
+  height: 22px;
+  background: rgba(255,255,255,.2);
+}
+
+.logo-title {
+  font-size: .78rem;
+  color: rgba(255,255,255,.65);
+  font-weight: 400;
+  letter-spacing: .02em;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-top {
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: var(--radius-sm);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .76rem;
+  font-weight: 500;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-top:hover { background: rgba(255,255,255,.22); }
+
+.btn-top.primary {
+  background: white;
+  color: var(--blue);
+  border-color: white;
+  font-weight: 600;
+}
+
+.btn-top.primary:hover { background: var(--blue-lt); }
+
+/* ── HERO ───────────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, var(--blue) 0%, var(--blue-mid) 100%);
+  padding: 28px 32px 0;
+}
+
+.hero-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: white;
+  letter-spacing: -.03em;
+  line-height: 1.1;
+}
+
+.hero h1 em {
+  font-style: italic;
+  color: #A8CAFF;
+}
+
+.hero-sub {
+  color: rgba(255,255,255,.6);
+  font-size: .82rem;
+  margin-top: 5px;
+  font-weight: 300;
+}
+
+/* ── STATS STRIP ────────────────────────────────────── */
+.stats-strip {
+  max-width: 1100px;
+  margin: 22px auto 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.stat {
+  background: white;
+  padding: 16px 18px 13px;
+  border-right: 1px solid var(--gray-200);
+  border-top: 1px solid var(--gray-200);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat:first-child { border-left: 1px solid var(--gray-200); border-radius: 10px 0 0 0; }
+.stat:last-child  { border-radius: 0 10px 0 0; }
+
+.stat::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.st-total::after  { background: var(--blue); }
+.st-pend::after   { background: var(--red); }
+.st-and::after    { background: var(--amber); }
+.st-block::after  { background: var(--purple); }
+.st-done::after   { background: var(--teal); }
+
+.stat-lbl {
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 5px;
+}
+
+.stat-val {
+  font-family: 'Fraunces', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -.03em;
+}
+
+.st-total .stat-val { color: var(--blue); }
+.st-pend .stat-val  { color: var(--red); }
+.st-and .stat-val   { color: var(--amber); }
+.st-block .stat-val { color: var(--purple); }
+.st-done .stat-val  { color: var(--teal); }
+
+/* ── PROGRESS BAND ──────────────────────────────────── */
+.prog-band {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 11px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.prog-label {
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  color: var(--gray-400);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.prog-bg {
+  flex: 1;
+  height: 6px;
+  background: var(--gray-100);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  border-radius: 3px;
+  transition: width .5s ease;
+}
+
+.prog-pct {
+  font-family: 'DM Mono', monospace;
+  font-size: .8rem;
+  font-weight: 500;
+  color: var(--blue);
+  min-width: 38px;
+  text-align: right;
+}
+
+/* ── MAIN ───────────────────────────────────────────── */
+.main {
+  max-width: 1100px;
+  margin: 28px auto;
+  padding: 0 32px;
+}
+
+/* ── TOOLBAR ────────────────────────────────────────── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.f-btn {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: 20px;
+  color: var(--gray-600);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .76rem;
+  font-weight: 500;
+  padding: 6px 16px;
+  cursor: pointer;
+  transition: all .15s;
+}
+
+.f-btn:hover, .f-btn.active {
+  border-color: var(--blue);
+  color: var(--blue);
+  background: var(--blue-lt);
+}
+
+.search {
+  margin-left: auto;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 7px 13px;
+  color: var(--gray-800);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .78rem;
+  outline: none;
+  width: 230px;
+  transition: border-color .15s;
+}
+
+.search:focus { border-color: var(--blue); }
+.search::placeholder { color: var(--gray-400); }
+
+/* ── ITEMS ──────────────────────────────────────────── */
+.list { display: flex; flex-direction: column; gap: 8px; }
+
+.item {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 14px;
+  align-items: start;
+  animation: slideIn .25s ease;
+  transition: box-shadow .15s, border-color .15s;
+  border-left: 4px solid transparent;
+}
+
+.item.s-pendente   { border-left-color: var(--red); }
+.item.s-andamento  { border-left-color: var(--amber); }
+.item.s-concluido  { border-left-color: var(--teal); }
+.item.s-bloqueado  { border-left-color: var(--purple); }
+
+@keyframes slideIn {
+  from { opacity:0; transform: translateY(-8px); }
+  to   { opacity:1; transform: translateY(0); }
+}
+
+.item:hover { box-shadow: var(--shadow); border-color: var(--blue-bdr); }
+
+.item-left { display: flex; flex-direction: column; gap: 7px; }
+
+.item-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.item-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--gray-800);
+  flex: 1;
+  min-width: 180px;
+  letter-spacing: -.01em;
+}
+
+.item-title.done {
+  text-decoration: line-through;
+  color: var(--gray-400);
+}
+
+/* BADGES */
+.badge {
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem;
+  font-weight: 500;
+  padding: 3px 10px;
+  border-radius: 10px;
+  white-space: nowrap;
+  letter-spacing: .02em;
+}
+
+.b-pendente  { background: var(--red-lt);    color: var(--red); }
+.b-andamento { background: var(--amber-lt);  color: var(--amber); }
+.b-concluido { background: var(--teal-lt);   color: var(--teal); }
+.b-bloqueado { background: var(--purple-lt); color: var(--purple); }
+
+.badge-cat {
+  font-size: .65rem;
+  padding: 2px 9px;
+  border-radius: 9px;
+  background: var(--gray-100);
+  color: var(--gray-600);
+  border: 1px solid var(--gray-200);
+  white-space: nowrap;
+}
+
+.badge-prio {
+  font-size: .63rem;
+  padding: 2px 9px;
+  border-radius: 9px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.badge-prio.Alta  { background: var(--red-lt);   color: var(--red); }
+.badge-prio.Média { background: var(--amber-lt); color: var(--amber); }
+.badge-prio.Baixa { background: var(--teal-lt);  color: var(--teal); }
+
+.item-desc {
+  font-size: .8rem;
+  color: var(--gray-600);
+  line-height: 1.55;
+}
+
+.item-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.meta {
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  color: var(--gray-400);
+}
+
+.meta b { color: var(--gray-600); font-weight: 500; }
+
+/* UPDATES */
+.updates {
+  border-left: 2px solid var(--gray-200);
+  padding-left: 12px;
+  margin-top: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.upd-row {
+  font-size: .76rem;
+  color: var(--gray-600);
+  line-height: 1.45;
+}
+
+.upd-date {
+  font-family: 'DM Mono', monospace;
+  font-size: .65rem;
+  color: var(--blue-mid);
+  margin-right: 6px;
+}
+
+.toggle-upd {
+  font-family: 'DM Mono', monospace;
+  font-size: .68rem;
+  color: var(--blue-mid);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 3px;
+}
+
+.toggle-upd:hover { text-decoration: underline; }
+
+/* ACTIONS */
+.item-right { display: flex; gap: 6px; }
+
+.act {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 7px;
+  color: var(--gray-600);
+  font-family: 'DM Sans', sans-serif;
+  font-size: .72rem;
+  padding: 5px 10px;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+}
+
+.act:hover { background: var(--blue-lt); border-color: var(--blue-bdr); color: var(--blue); }
+.act.del:hover { background: var(--red-lt); border-color: #F5BABA; color: var(--red); }
+
+/* ── EMPTY ──────────────────────────────────────────── */
+.empty {
+  text-align: center;
+  padding: 56px 20px;
+  border: 1px dashed var(--gray-200);
+  border-radius: var(--radius);
+  background: white;
+  color: var(--gray-400);
+}
+
+.empty strong {
+  display: block;
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  color: var(--gray-600);
+  margin-bottom: 6px;
+}
+
+/* ── MODAL ──────────────────────────────────────────── */
+.modal-bg {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,15,50,.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+
+.modal-bg.open { display: flex; }
+
+.modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow-lg);
+  padding: 28px;
+  width: 100%;
+  max-width: 520px;
+  animation: popIn .2s ease;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+@keyframes popIn {
+  from { transform: scale(.95); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.modal-hdr {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.modal-icon {
+  width: 38px; height: 38px;
+  background: var(--blue-lt);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+}
+
+.modal-hdr h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  letter-spacing: -.02em;
+}
+
+.fg { margin-bottom: 13px; }
+
+.fl {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: .62rem;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--gray-400);
+  margin-bottom: 5px;
+}
+
+.fi, .fs, .fta {
+  width: 100%;
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  color: var(--gray-800);
+  padding: 9px 12px;
+  font-size: .84rem;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+
+.fi:focus, .fs:focus, .fta:focus { border-color: var(--blue); background: white; }
+.fta { resize: vertical; min-height: 76px; }
+
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+
+.modal-ftr {
+  display: flex;
+  gap: 9px;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-100);
+}
+
+.btn-cancel {
+  background: var(--gray-100);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
+  color: var(--gray-600);
+  padding: 9px 18px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .82rem;
+  cursor: pointer;
+}
+
+.btn-cancel:hover { background: var(--gray-200); }
+
+.btn-save {
+  background: var(--blue);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 9px 22px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: .82rem;
+  cursor: pointer;
+  transition: background .15s;
+}
+
+.btn-save:hover { background: var(--blue-mid); }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--blue);
+  color: white;
+  padding: 10px 18px;
+  border-radius: 9px;
+  font-size: .78rem;
+  font-weight: 500;
+  box-shadow: 0 4px 18px rgba(0,63,136,.3);
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.toast.show { opacity: 1; }
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--gray-400);
+  font-size: .7rem;
+  border-top: 1px solid var(--gray-200);
+  margin-top: 40px;
+}
+
+/* SYNC STATUS */
+.sync-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #4CAF50;
+  display: inline-block;
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .stats-strip { grid-template-columns: repeat(3,1fr); }
+  .stat:nth-child(3) { border-radius: 0 10px 0 0 !important; }
+  .main { padding: 0 16px; }
+  .topbar { padding: 0 16px; }
+  .hero { padding: 20px 16px 0; }
+  .search { width: 100%; margin-left: 0; }
+  .frow { grid-template-columns: 1fr; }
+  .logo-title { display: none; }
+  .topbar-actions .btn-top:not(.primary) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-badge">
+      <span class="name">orizon</span>
+      <span class="tagline">Defendendo a saúde</span>
+    </div>
+    <div class="logo-divider"></div>
+    <span class="logo-title">Diário de Implantação</span>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn-top" onclick="exportarExcel()">⬇ Excel</button>
+    <button class="btn-top primary" onclick="abrirModal()">+ Nova Pendência</button>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-inner">
+    <h1>Acompanhamento de <em>Implantação</em></h1>
+    <p class="hero-sub" id="dataHoje"></p>
+  </div>
+
+  <div class="stats-strip">
+    <div class="stat st-total">
+      <div class="stat-lbl">Total</div>
+      <div class="stat-val" id="st-total">0</div>
+    </div>
+    <div class="stat st-pend">
+      <div class="stat-lbl">Pendentes</div>
+      <div class="stat-val" id="st-pend">0</div>
+    </div>
+    <div class="stat st-and">
+      <div class="stat-lbl">Andamento</div>
+      <div class="stat-val" id="st-and">0</div>
+    </div>
+    <div class="stat st-block">
+      <div class="stat-lbl">Bloqueados</div>
+      <div class="stat-val" id="st-block">0</div>
+    </div>
+    <div class="stat st-done">
+      <div class="stat-lbl">Concluídos</div>
+      <div class="stat-val" id="st-done">0</div>
+    </div>
+  </div>
+
+  <div class="prog-band">
+    <span class="prog-label">Progresso</span>
+    <div class="prog-bg">
+      <div class="prog-fill" id="progFill" style="width:0%"></div>
+    </div>
+    <span class="prog-pct" id="progPct">0%</span>
+    <span style="font-size:.7rem;color:rgba(255,255,255,.4);margin-left:8px;">
+      <span class="sync-dot"></span><span style="color:var(--gray-400);font-family:'DM Mono',monospace;font-size:.65rem;" id="syncLabel">sincronizado</span>
+    </span>
+  </div>
+</div>
+
+<div class="main">
+  <div class="toolbar">
+    <button class="f-btn active" onclick="setFiltro(this,'todos')">Todos</button>
+    <button class="f-btn" onclick="setFiltro(this,'pendente')">Pendentes</button>
+    <button class="f-btn" onclick="setFiltro(this,'andamento')">Em andamento</button>
+    <button class="f-btn" onclick="setFiltro(this,'bloqueado')">Bloqueados</button>
+    <button class="f-btn" onclick="setFiltro(this,'concluido')">Concluídos</button>
+    <input class="search" type="text" id="searchInput" placeholder="🔍  Pesquisar..." oninput="renderLista()">
+  </div>
+  <div class="list" id="lista"></div>
+</div>
+
+<footer>
+  Orizon · Diário de Implantação · <span class="sync-dot"></span>Dados sincronizados na nuvem
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<!-- MODAL PENDÊNCIA -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-icon">📋</div>
+      <h2 id="modalTit">Nova Pendência</h2>
+    </div>
+    <div class="fg">
+      <label class="fl">Título *</label>
+      <input class="fi" id="fTitulo" placeholder="Ex: Configuração do ponto eletrônico">
+    </div>
+    <div class="fg">
+      <label class="fl">Descrição</label>
+      <textarea class="fta" id="fDesc" placeholder="Descreva a pendência, área responsável, o que está aguardando..."></textarea>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Status</label>
+        <select class="fs" id="fStatus">
+          <option value="pendente">Pendente</option>
+          <option value="andamento">Em andamento</option>
+          <option value="bloqueado">Bloqueado</option>
+          <option value="concluido">Concluído</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Prioridade</label>
+        <select class="fs" id="fPrio">
+          <option value="Alta">Alta</option>
+          <option value="Média">Média</option>
+          <option value="Baixa">Baixa</option>
+        </select>
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Categoria</label>
+        <input class="fi" id="fCat" placeholder="Ex: RH, TI, Gestão...">
+      </div>
+      <div class="fg">
+        <label class="fl">Responsável / Área</label>
+        <input class="fi" id="fResp" placeholder="Ex: TI Central">
+      </div>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Data de abertura</label>
+        <input class="fi" id="fAbertura" type="date">
+      </div>
+      <div class="fg">
+        <label class="fl">Previsão de conclusão</label>
+        <input class="fi" id="fPrevisao" type="date">
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-save" onclick="salvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ATUALIZAÇÃO -->
+<div class="modal-bg" id="updBg">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-icon">📝</div>
+      <h2>Registrar Atualização</h2>
+    </div>
+    <div class="fg">
+      <label class="fl">O que aconteceu?</label>
+      <textarea class="fta" id="fUpd" placeholder="Descreva a novidade: reunião realizada, e-mail recebido, decisão tomada..."></textarea>
+    </div>
+    <div class="frow">
+      <div class="fg">
+        <label class="fl">Novo status (opcional)</label>
+        <select class="fs" id="fUpdStatus">
+          <option value="">Manter atual</option>
+          <option value="pendente">Pendente</option>
+          <option value="andamento">Em andamento</option>
+          <option value="bloqueado">Bloqueado</option>
+          <option value="concluido">Concluído</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">Nova previsão (opcional)</label>
+        <input class="fi" id="fUpdPrev" type="date">
+      </div>
+    </div>
+    <div class="modal-ftr">
+      <button class="btn-cancel" onclick="fecharUpd()">Cancelar</button>
+      <button class="btn-save" onclick="salvarUpd()">Registrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = 'orizon-diario-v2';
+let items = [];
+let filtro = 'todos';
+let editId = null;
+let updId  = null;
+let toastTimer = null;
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function hoje() { return new Date().toISOString().split('T')[0]; }
+function fmt(d) {
+  if (!d) return '';
+  const [y,m,dia] = d.split('-');
+  return `${dia}/${m}/${y}`;
+}
+
+// ── CLOUD STORAGE ─────────────────────────────────────
+async function load() {
+  document.getElementById('syncLabel').textContent = 'carregando...';
+  try {
+    const res = await window.storage.get(KEY);
+    if (res && res.value) items = JSON.parse(res.value);
+  } catch(e) {
+    try { items = JSON.parse(localStorage.getItem(KEY)||'[]'); } catch(_){}
+  }
+  if (!items.length) seed();
+  document.getElementById('syncLabel').textContent = 'sincronizado';
+  renderAll();
+}
+
+async function save() {
+  document.getElementById('syncLabel').textContent = 'salvando...';
+  const d = JSON.stringify(items);
+  try { await window.storage.set(KEY, d); } catch(e) { localStorage.setItem(KEY, d); }
+  document.getElementById('syncLabel').textContent = 'sincronizado';
+  toast('✓ Salvo na nuvem');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+function seed() {
+  const h = hoje();
+  items = [
+    { id:uid(), titulo:'Implantação do ponto eletrônico', desc:'Colaboradores ainda não iniciaram a marcação de ponto. Aguardando liberação do sistema pela TI.', status:'pendente', prioridade:'Alta', categoria:'RH', responsavel:'TI Central', abertura:h, previsao:'', updates:[{data:h,texto:'Pendência registrada. TI informou que o sistema está em configuração.'}] },
+    { id:uid(), titulo:'Criação de indicadores do departamento', desc:'Definição de KPIs e dashboard de acompanhamento. Reunião já agendada com a controladoria.', status:'andamento', prioridade:'Alta', categoria:'Gestão', responsavel:'Controladoria', abertura:h, previsao:'', updates:[{data:h,texto:'Reunião agendada com a controladoria para alinhamento dos indicadores.'}] },
+    { id:uid(), titulo:'Cadastro de colaboradores no sistema', desc:'Todos os colaboradores foram cadastrados no sistema de RH com sucesso.', status:'concluido', prioridade:'Alta', categoria:'RH', responsavel:'RH Central', abertura:h, previsao:h, updates:[{data:h,texto:'Concluído! Todos os colaboradores cadastrados. ✓'}] },
+    { id:uid(), titulo:'Acesso ao sistema ERP', desc:'Aguardando assinatura do contrato com o fornecedor para liberação dos acessos.', status:'bloqueado', prioridade:'Alta', categoria:'TI', responsavel:'Jurídico / TI', abertura:h, previsao:'', updates:[{data:h,texto:'Bloqueado — contrato ainda não assinado pelo jurídico.'}] },
+  ];
+}
+
+// ── RENDER ────────────────────────────────────────────
+function renderAll() {
+  stats();
+  renderLista();
+  document.getElementById('dataHoje').textContent =
+    new Date().toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+
+function stats() {
+  const t = items.length;
+  const p = items.filter(i=>i.status==='pendente').length;
+  const a = items.filter(i=>i.status==='andamento').length;
+  const b = items.filter(i=>i.status==='bloqueado').length;
+  const c = items.filter(i=>i.status==='concluido').length;
+  document.getElementById('st-total').textContent = t;
+  document.getElementById('st-pend').textContent  = p;
+  document.getElementById('st-and').textContent   = a;
+  document.getElementById('st-block').textContent = b;
+  document.getElementById('st-done').textContent  = c;
+  const pct = t ? Math.round(c/t*100) : 0;
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent  = pct+'%';
+}
+
+function renderLista() {
+  const busca = document.getElementById('searchInput').value.toLowerCase();
+  let lista = [...items];
+  if (filtro !== 'todos') lista = lista.filter(i=>i.status===filtro);
+  if (busca) lista = lista.filter(i=>
+    i.titulo.toLowerCase().includes(busca)||
+    (i.desc||'').toLowerCase().includes(busca)||
+    (i.categoria||'').toLowerCase().includes(busca)||
+    (i.responsavel||'').toLowerCase().includes(busca)
+  );
+  const order = {pendente:0,bloqueado:1,andamento:2,concluido:3};
+  lista.sort((a,b)=>(order[a.status]||0)-(order[b.status]||0));
+
+  const el = document.getElementById('lista');
+  if (!lista.length) {
+    el.innerHTML = `<div class="empty"><strong>Nenhuma pendência encontrada</strong>Clique em "+ Nova Pendência" para começar.</div>`;
+    return;
+  }
+
+  const lbs = {pendente:'Pendente',andamento:'Em andamento',concluido:'Concluído',bloqueado:'Bloqueado'};
+
+  el.innerHTML = lista.map(it=>{
+    const ups = it.updates||[];
+    const vis = it._all ? ups : ups.slice(-2);
+    const updsHtml = ups.length ? `
+      <div class="updates">
+        ${vis.map(u=>`<div class="upd-row"><span class="upd-date">${fmt(u.data)}</span>${u.texto}</div>`).join('')}
+      </div>
+      ${ups.length>2?`<button class="toggle-upd" onclick="toggleUpds('${it.id}')">${it._all?'▲ Mostrar menos':`▼ Ver todas (${ups.length})`}</button>`:''}
+    `:'';
+    return `
+    <div class="item s-${it.status}">
+      <div class="item-left">
+        <div class="item-top">
+          <div class="item-title ${it.status==='concluido'?'done':''}">${it.titulo}</div>
+          <span class="badge b-${it.status}">${lbs[it.status]}</span>
+          ${it.prioridade?`<span class="badge-prio ${it.prioridade}">${it.prioridade}</span>`:''}
+          ${it.categoria?`<span class="badge-cat">${it.categoria}</span>`:''}
+        </div>
+        ${it.desc?`<div class="item-desc">${it.desc}</div>`:''}
+        <div class="item-meta">
+          ${it.responsavel?`<span class="meta">👤 <b>${it.responsavel}</b></span>`:''}
+          ${it.previsao?`<span class="meta">📅 Previsão: <b>${fmt(it.previsao)}</b></span>`:''}
+          <span class="meta">📌 Aberto em <b>${fmt(it.abertura)}</b></span>
+        </div>
+        ${updsHtml}
+      </div>
+      <div class="item-right">
+        <button class="act" onclick="abrirUpd('${it.id}')">📝 Atualizar</button>
+        <button class="act" onclick="abrirModal('${it.id}')">✏️</button>
+        <button class="act del" onclick="deletar('${it.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function toggleUpds(id) {
+  const it = items.find(i=>i.id===id);
+  if (it) { it._all=!it._all; renderLista(); }
+}
+
+function setFiltro(btn, f) {
+  document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  filtro = f;
+  renderLista();
+}
+
+// ── MODAL PENDÊNCIA ───────────────────────────────────
+function abrirModal(id=null) {
+  editId = id;
+  const it = id ? items.find(i=>i.id===id) : null;
+  document.getElementById('modalTit').textContent = id ? 'Editar Pendência' : 'Nova Pendência';
+  document.getElementById('fTitulo').value    = it?.titulo     ||'';
+  document.getElementById('fDesc').value      = it?.desc       ||'';
+  document.getElementById('fStatus').value    = it?.status     ||'pendente';
+  document.getElementById('fPrio').value      = it?.prioridade ||'Alta';
+  document.getElementById('fCat').value       = it?.categoria  ||'';
+  document.getElementById('fResp').value      = it?.responsavel||'';
+  document.getElementById('fAbertura').value  = it?.abertura   ||hoje();
+  document.getElementById('fPrevisao').value  = it?.previsao   ||'';
+  document.getElementById('modalBg').classList.add('open');
+  setTimeout(()=>document.getElementById('fTitulo').focus(),80);
+}
+
+function fecharModal() { document.getElementById('modalBg').classList.remove('open'); editId=null; }
+
+function salvar() {
+  const titulo = document.getElementById('fTitulo').value.trim();
+  if (!titulo) { document.getElementById('fTitulo').style.borderColor='var(--red)'; return; }
+  document.getElementById('fTitulo').style.borderColor='';
+  const h = hoje();
+  const dado = {
+    titulo,
+    desc:       document.getElementById('fDesc').value.trim(),
+    status:     document.getElementById('fStatus').value,
+    prioridade: document.getElementById('fPrio').value,
+    categoria:  document.getElementById('fCat').value.trim(),
+    responsavel:document.getElementById('fResp').value.trim(),
+    abertura:   document.getElementById('fAbertura').value||h,
+    previsao:   document.getElementById('fPrevisao').value,
+  };
+  if (editId) {
+    const idx = items.findIndex(i=>i.id===editId);
+    const old = items[idx].status;
+    items[idx] = {...items[idx], ...dado};
+    if (old !== dado.status) {
+      const lbs = {pendente:'Pendente',andamento:'Em andamento',concluido:'Concluído',bloqueado:'Bloqueado'};
+      items[idx].updates = items[idx].updates||[];
+      items[idx].updates.push({data:h, texto:`Status alterado para: ${lbs[dado.status]}`});
+    }
+  } else {
+    items.unshift({id:uid(), updates:[], ...dado});
+  }
+  save();
+  fecharModal();
+  renderAll();
+}
+
+function deletar(id) {
+  if (!confirm('Excluir esta pendência?')) return;
+  items = items.filter(i=>i.id!==id);
+  save();
+  renderAll();
+}
+
+// ── MODAL ATUALIZAÇÃO ─────────────────────────────────
+function abrirUpd(id) {
+  updId = id;
+  document.getElementById('fUpd').value = '';
+  document.getElementById('fUpdStatus').value = '';
+  document.getElementById('fUpdPrev').value = '';
+  document.getElementById('updBg').classList.add('open');
+  setTimeout(()=>document.getElementById('fUpd').focus(),80);
+}
+
+function fecharUpd() { document.getElementById('updBg').classList.remove('open'); updId=null; }
+
+function salvarUpd() {
+  const texto = document.getElementById('fUpd').value.trim();
+  if (!texto) return;
+  const ns = document.getElementById('fUpdStatus').value;
+  const np = document.getElementById('fUpdPrev').value;
+  const idx = items.findIndex(i=>i.id===updId);
+  if (idx===-1) return;
+  items[idx].updates = items[idx].updates||[];
+  items[idx].updates.push({data:hoje(), texto});
+  if (ns) items[idx].status  = ns;
+  if (np) items[idx].previsao = np;
+  save();
+  fecharUpd();
+  renderAll();
+}
+
+// ── EXPORTAR EXCEL ────────────────────────────────────
+function exportarExcel() {
+  const lbs = {pendente:'Pendente',andamento:'Em andamento',concluido:'Concluído',bloqueado:'Bloqueado'};
+  const wb = XLSX.utils.book_new();
+
+  const ws1 = XLSX.utils.json_to_sheet(items.map(it=>({
+    'Título':          it.titulo,
+    'Status':          lbs[it.status]||it.status,
+    'Prioridade':      it.prioridade||'',
+    'Categoria':       it.categoria||'',
+    'Responsável':     it.responsavel||'',
+    'Data Abertura':   fmt(it.abertura),
+    'Previsão':        fmt(it.previsao),
+    'Descrição':       it.desc||'',
+    'Qtd. Atualizações': (it.updates||[]).length,
+  })));
+  ws1['!cols'] = [40,16,12,16,22,14,14,48,12].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, ws1, 'Pendências');
+
+  const hist = [];
+  items.forEach(it=>(it.updates||[]).forEach(u=>{
+    hist.push({'Data':fmt(u.data),'Pendência':it.titulo,'Status':lbs[it.status]||it.status,'Atualização':u.texto});
+  }));
+  const ws2 = XLSX.utils.json_to_sheet(hist.length?hist:[{'Info':'Sem atualizações.'}]);
+  ws2['!cols'] = [14,36,16,60].map(w=>({wch:w}));
+  XLSX.utils.book_append_sheet(wb, ws2, 'Histórico');
+
+  const ws3 = XLSX.utils.json_to_sheet([
+    {'Status':'Pendente',    'Qtd.':items.filter(i=>i.status==='pendente').length},
+    {'Status':'Em andamento','Qtd.':items.filter(i=>i.status==='andamento').length},
+    {'Status':'Bloqueado',   'Qtd.':items.filter(i=>i.status==='bloqueado').length},
+    {'Status':'Concluído',   'Qtd.':items.filter(i=>i.status==='concluido').length},
+    {'Status':'TOTAL',       'Qtd.':items.length},
+  ]);
+  XLSX.utils.book_append_sheet(wb, ws3, 'Resumo');
+
+  XLSX.writeFile(wb, `orizon-implantacao-${hoje()}.xlsx`);
+}
+
+// ── TECLADO ───────────────────────────────────────────
+document.addEventListener('keydown', e=>{
+  if (e.key==='Escape') { fecharModal(); fecharUpd(); }
+});
+document.getElementById('modalBg').addEventListener('click', e=>{ if(e.target===document.getElementById('modalBg')) fecharModal(); });
+document.getElementById('updBg').addEventListener('click', e=>{ if(e.target===document.getElementById('updBg')) fecharUpd(); });
+
+// ── INIT ──────────────────────────────────────────────
+load();
+</script>
+</body>
+</html>
